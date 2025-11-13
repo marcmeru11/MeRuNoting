@@ -59,4 +59,7 @@ dependencies {
 
     implementation("androidx.room:room-runtime:2.8.3")
     ksp("androidx.room:room-compiler:2.8.3")
+
+    implementation("androidx.compose.material:material-icons-core:1.7.8")
+    implementation("androidx.compose.material:material-icons-extended:1.7.8")
 }
