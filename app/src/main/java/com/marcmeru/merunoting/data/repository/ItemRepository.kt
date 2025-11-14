@@ -3,7 +3,6 @@ package com.marcmeru.merunoting.data.repository
 import com.marcmeru.merunoting.data.dao.ItemDao
 import com.marcmeru.merunoting.data.entity.Item
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 
 /**
  * Repositorio encargado de gestionar las operaciones de acceso a datos para los [Item].
@@ -19,9 +18,7 @@ class ItemRepository(private val itemDao: ItemDao) {
      *
      * @return Flujo que emite la lista de items raíz.
      */
-    fun getRootItems(): Flow<List<Item>> = flow {
-        emit(itemDao.getRootItems())
-    }
+    fun getRootItems(): Flow<List<Item>> = itemDao.getRootItems()
 
     /**
      * Obtiene los hijos directos de un item padre identificado por [parentId].
@@ -29,9 +26,7 @@ class ItemRepository(private val itemDao: ItemDao) {
      * @param parentId ID del item padre.
      * @return Flujo que emite la lista de hijos.
      */
-    fun getChildren(parentId: Long): Flow<List<Item>> = flow {
-        emit(itemDao.getChildren(parentId))
-    }
+    fun getChildren(parentId: Long): Flow<List<Item>> = itemDao.getChildren(parentId)
 
     /**
      * Inserta un nuevo item en la base de datos.
@@ -68,5 +63,5 @@ class ItemRepository(private val itemDao: ItemDao) {
      * @param id ID del item buscado.
      * @return Item si se encuentra; null en caso contrario.
      */
-    suspend fun getById(id: Long): Item? = itemDao.getById(id)
+    suspend fun getById(id: Long): Item = itemDao.getById(id)
 }

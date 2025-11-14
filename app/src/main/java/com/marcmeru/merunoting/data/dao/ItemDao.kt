@@ -8,6 +8,8 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.marcmeru.merunoting.data.entity.Item
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 
 /**
  * Data Access Object (DAO) for performing database operations on [Item] entities.
@@ -50,24 +52,24 @@ interface ItemDao {
      * @return The item if found, or null.
      */
     @Query("SELECT * FROM items WHERE id = :id")
-    suspend fun getById(id: Long): Item?
+    suspend fun getById(id: Long): Item
 
     /**
-     * Retrieves all root-level items (items with no parent).
+     * Retrieves all root items (items without a parent).
      *
-     * @return List of root items ordered by name.
+     * @return Flow emitting lists of root items ordered by name.
      */
     @Query("SELECT * FROM items WHERE parent_id IS NULL ORDER BY name")
-    suspend fun getRootItems(): List<Item>
+    fun getRootItems(): Flow<List<Item>>
 
     /**
-     * Retrieves all direct children of a parent item identified by [parentId].
+     * Retrieves all child items of the specified parent [parentId].
      *
      * @param parentId The ID of the parent item.
-     * @return List of child items ordered by name.
+     * @return Flow emitting lists of child items ordered by name.
      */
     @Query("SELECT * FROM items WHERE parent_id = :parentId ORDER BY name")
-    suspend fun getChildren(parentId: Long): List<Item>
+    fun getChildren(parentId: Long): Flow<List<Item>>
 
     /**
      * Retrieves all items in the database ordered by name.
@@ -86,8 +88,13 @@ interface ItemDao {
      */
     @Transaction
     suspend fun deleteWithChildren(item: Item) {
-        val children = getChildren(item.id)
-        children.forEach { deleteWithChildren(it) }
+        val childrenList = getChildren(item.id).first()
+        childrenList.forEach { child ->
+            deleteWithChildren(child)
+        }
         delete(item)
     }
+
+
+
 }
