@@ -1,10 +1,14 @@
 package com.marcmeru.merunoting.ui.view
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import com.marcmeru.merunoting.data.entity.Item
 import com.marcmeru.merunoting.viewModel.ItemViewModel
 import kotlinx.coroutines.launch
 
@@ -17,8 +21,8 @@ fun MainView(
     val scope = rememberCoroutineScope()
     var selectedTabIndex by remember { mutableIntStateOf(0) }
 
-    // Estado para carpeta seleccionada, inicializado con el parámetro
     var selectedFolderId by remember { mutableStateOf(initialFolderId) }
+    var selectedNote by remember { mutableStateOf<Item?>(null) }
 
     val tabTitles = listOf("Carpetas", "Recientes")
 
@@ -32,27 +36,54 @@ fun MainView(
             )
         },
         floatingActionButton = {
-            AddFolderFab(
-                viewModel = viewModel,
-                currentFolderId = selectedFolderId
-            )
-                               },
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.padding(bottom = 56.dp, end = 16.dp)
+            ) {
+                AddFolderFab(
+                    viewModel = viewModel,
+                    currentFolderId = selectedFolderId
+                )
+                AddNoteFab(
+                    viewModel = viewModel,
+                    currentFolderId = selectedFolderId,
+                    onNoteCreated = { note ->
+                        selectedNote = note
+                    }
+                )
+            }
+        },
         bottomBar = { /* Tu barra inferior si la tienes */ }
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
-            when (selectedTabIndex) {
-                0 -> ItemsView(
-                    viewModel = viewModel,
-                    selectedFolderId = selectedFolderId,
-                    onFolderSelected = { folderId ->
-                        selectedFolderId = folderId
-                    }
-                )
-                1 -> RecientesView()
+            when {
+                selectedNote != null -> {
+                    NoteDetailView(
+                        viewModel = viewModel,
+                        note = selectedNote!!,
+                        onNoteUpdated = {
+                            selectedNote = null
+                        },
+                        onCancel = {
+                            selectedNote = null
+                        }
+                    )
+                }
+
+                selectedTabIndex == 0 -> {
+                    ItemsView(
+                        viewModel = viewModel,
+                        selectedFolderId = selectedFolderId,
+                        onFolderSelected = { folderId -> selectedFolderId = folderId },
+                        onNoteSelected = { note -> selectedNote = note }
+                    )
+                }
+                selectedTabIndex == 1 -> RecientesView()
             }
         }
     }
 }
+
 
 
 @Composable

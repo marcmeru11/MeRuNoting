@@ -24,7 +24,8 @@ import kotlinx.coroutines.launch
 fun ItemsView(
     viewModel: ItemViewModel,
     selectedFolderId: Long? = null,
-    onFolderSelected: (Long?) -> Unit
+    onFolderSelected: (Long?) -> Unit,
+    onNoteSelected: (Item) -> Unit
 ) {
     val rootItems by viewModel.rootItems.collectAsState()
     val childrenMap by viewModel.children.collectAsState()
@@ -61,7 +62,7 @@ fun ItemsView(
             folders = path,
             onFolderSelected = onFolderSelected
         )
-        LazyVerticalGrid(
+        androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             contentPadding = PaddingValues(8.dp),
             modifier = Modifier.weight(1f)
@@ -81,66 +82,8 @@ fun ItemsView(
                         modifier = Modifier
                             .padding(8.dp)
                             .height(160.dp)
+                            .clickable { onNoteSelected(item) }  // Para editar nota
                     )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun BreadcrumbPath(
-    folders: List<Item>,
-    onFolderSelected: (Long?) -> Unit,
-    maxVisibleItems: Int = 4 // ajustar según diseño
-) {
-    val displayFolders = remember(folders) {
-        if (folders.size > maxVisibleItems && maxVisibleItems > 1) {
-            listOf<Item?>(null) + folders.takeLast(maxVisibleItems - 1)
-        } else {
-            folders.map { it }
-        }
-    }
-
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(12.dp)
-    ) {
-        Icon(
-            imageVector = Icons.Filled.Home,
-            contentDescription = "Root",
-            modifier = Modifier
-                .size(24.dp)
-                .clickable { onFolderSelected(null) }
-        )
-        Spacer(Modifier.width(8.dp))
-        if (displayFolders.isNotEmpty()) {
-            Text(" > ", modifier = Modifier.padding(horizontal = 4.dp))
-        }
-        LazyRow {
-            itemsIndexed(displayFolders) { index, folder ->
-                if (folder == null) {
-                    Text(
-                        text = "...  > ",
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.clickable { onFolderSelected(null) }
-                            .padding(horizontal = 8.dp)
-                    )
-                } else {
-                    Text(
-                        text = folder.name,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier
-                            .clickable { onFolderSelected(folder.id) }
-                            .padding(horizontal = 4.dp)
-                    )
-                    if (index != displayFolders.lastIndex) {
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(">", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Spacer(modifier = Modifier.width(4.dp))
-                    }
                 }
             }
         }
