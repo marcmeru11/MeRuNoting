@@ -9,6 +9,7 @@ import androidx.room.Transaction
 import androidx.room.Update
 import com.marcmeru.merunoting.data.entity.Item
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 
 /**
  * Data Access Object (DAO) for performing database operations on [Item] entities.
@@ -87,10 +88,9 @@ interface ItemDao {
      */
     @Transaction
     suspend fun deleteWithChildren(item: Item) {
-        getChildren(item.id).collect { childrenList ->
-            childrenList.forEach { child ->
-                deleteWithChildren(child)
-            }
+        val childrenList = getChildren(item.id).first()
+        childrenList.forEach { child ->
+            deleteWithChildren(child)
         }
         delete(item)
     }
