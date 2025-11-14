@@ -4,7 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.marcmeru.merunoting.data.entity.Item
 import com.marcmeru.merunoting.data.repository.ItemRepository
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 /**
@@ -21,13 +22,13 @@ class ItemViewModel(private val repository: ItemRepository) : ViewModel() {
     /**
      * Flujo de estado con la lista actual de items raíz (sin padre).
      */
-    val rootItems: StateFlow<List<Item>> = _rootItems.asStateFlow()
+    val rootItems: StateFlow<List<Item>> = _rootItems
 
     private val _children = MutableStateFlow<Map<Long, List<Item>>>(emptyMap())
     /**
      * Flujo de estado que mapea el id del item padre a la lista de sus hijos.
      */
-    val children: StateFlow<Map<Long, List<Item>>> = _children.asStateFlow()
+    val children: StateFlow<Map<Long, List<Item>>> = _children
 
     /**
      * Carga y actualiza la lista de items raíz desde el repositorio.
@@ -92,5 +93,17 @@ class ItemViewModel(private val repository: ItemRepository) : ViewModel() {
             repository.deleteWithChildren(item)
             onComplete?.invoke()
         }
+    }
+
+    /**
+     * Obtiene un [Item] por su [id].
+     *
+     * Esta función es suspend para evitar bloqueos y debe llamarse desde coroutine o LaunchedEffect.
+     *
+     * @param id ID del item a obtener.
+     * @return El [Item] correspondiente al ID proporcionado, o null si no existe.
+     */
+    suspend fun getItemById(id: Long): Item {
+        return repository.getById(id)
     }
 }

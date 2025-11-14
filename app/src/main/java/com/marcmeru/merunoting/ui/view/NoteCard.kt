@@ -17,8 +17,8 @@ fun NoteCard(item: Item, modifier: Modifier = Modifier) {
     if (item.type == "note") {
         Surface(
             modifier = modifier
-                .fillMaxWidth() // ancho completo de su padre
-                .heightIn(min = 100.dp) // altura mínima
+                .fillMaxWidth()
+                .heightIn(min = 100.dp)
                 .shadow(elevation = 8.dp, shape = RoundedCornerShape(16.dp)),
             shape = RoundedCornerShape(16.dp),
             color = MaterialTheme.colorScheme.surfaceVariant

@@ -23,7 +23,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MeRuNotingTheme {
-                MainView(viewModel = viewModel, selectedFolderId = null)
+                MainView(viewModel = viewModel)
             }
         }
     }

@@ -11,11 +11,15 @@ import kotlinx.coroutines.launch
 @Composable
 fun MainView(
     viewModel: ItemViewModel,
-    selectedFolderId: Long? = null
+    initialFolderId: Long? = null
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     var selectedTabIndex by remember { mutableIntStateOf(0) }
+
+    // Estado para carpeta seleccionada, inicializado con el parámetro
+    var selectedFolderId by remember { mutableStateOf(initialFolderId) }
+
     val tabTitles = listOf("Carpetas", "Recientes")
 
     Scaffold(
@@ -27,20 +31,29 @@ fun MainView(
                 openDrawer = { scope.launch { drawerState.open() } }
             )
         },
-        floatingActionButton = { /* Tu FAB personalizado */ },
+        floatingActionButton = {
+            AddFolderFab(
+                viewModel = viewModel,
+                currentFolderId = selectedFolderId
+            )
+                               },
         bottomBar = { /* Tu barra inferior si la tienes */ }
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
             when (selectedTabIndex) {
                 0 -> ItemsView(
                     viewModel = viewModel,
-                    selectedFolderId = selectedFolderId
+                    selectedFolderId = selectedFolderId,
+                    onFolderSelected = { folderId ->
+                        selectedFolderId = folderId
+                    }
                 )
                 1 -> RecientesView()
             }
         }
     }
 }
+
 
 @Composable
 fun RecientesView() {
