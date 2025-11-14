@@ -34,7 +34,7 @@ fun NoteCard(
             Column(
                 modifier = Modifier
                     .background(MaterialTheme.colorScheme.surfaceVariant)
-                    .padding(16.dp)
+                    .padding(10.dp)
             ) {
                 Box(
                     modifier = Modifier.fillMaxWidth()
@@ -45,7 +45,9 @@ fun NoteCard(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.align(Alignment.CenterStart)
+                        modifier = Modifier
+                            .align(Alignment.CenterStart)
+                            .padding(end = 33.dp)
                     )
                     IconButton(
                         onClick = { expanded = true },
@@ -69,6 +71,7 @@ fun NoteCard(
                         )
                     }
                 }
+
 
                 Spacer(modifier = Modifier.height(8.dp))
 

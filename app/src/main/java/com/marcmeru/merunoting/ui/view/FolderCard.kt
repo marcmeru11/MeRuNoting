@@ -24,6 +24,7 @@ fun FolderCard(
     onDeleteClicked: (Item) -> Unit = {}
 ) {
     var expanded by remember { mutableStateOf(false) }
+    var showConfirmDelete by remember { mutableStateOf(false) }
 
     Surface(
         modifier = modifier
@@ -44,7 +45,7 @@ fun FolderCard(
                     ),
                     shape = RoundedCornerShape(16.dp)
                 )
-                .padding(16.dp)
+                .padding(10.dp)
         ) {
             Box(
                 modifier = Modifier.fillMaxWidth()
@@ -74,7 +75,7 @@ fun FolderCard(
                         text = { Text("Eliminar") },
                         onClick = {
                             expanded = false
-                            onDeleteClicked(item)
+                            showConfirmDelete = true
                         }
                     )
                 }
@@ -91,5 +92,28 @@ fun FolderCard(
                 modifier = Modifier.fillMaxWidth(),
             )
         }
+    }
+
+    if (showConfirmDelete) {
+        AlertDialog(
+            onDismissRequest = { showConfirmDelete = false },
+            title = { Text("Confirmar eliminación") },
+            text = { Text("¿Eliminar la carpeta \"${item.name}\"?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onDeleteClicked(item)
+                        showConfirmDelete = false
+                    }
+                ) {
+                    Text("Eliminar")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showConfirmDelete = false }) {
+                    Text("Cancelar")
+                }
+            }
+        )
     }
 }
