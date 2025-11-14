@@ -14,14 +14,15 @@ fun NoteDetailView(
     viewModel: ItemViewModel,
     note: Item,
     onNoteUpdated: () -> Unit,
-    onCancel: () -> Unit
+    onCancel: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     var title by remember { mutableStateOf(note.name) }
     var content by remember { mutableStateOf(note.content ?: "") }
     var isSaving by remember { mutableStateOf(false) }
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(24.dp)
     ) {
@@ -46,7 +47,7 @@ fun NoteDetailView(
             label = { Text("Contenido") },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(240.dp),
+                .weight(1f),
             singleLine = false,
             maxLines = Int.MAX_VALUE
         )

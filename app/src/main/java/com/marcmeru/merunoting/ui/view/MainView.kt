@@ -3,6 +3,7 @@ package com.marcmeru.merunoting.ui.view
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -27,30 +28,36 @@ fun MainView(
     val tabTitles = listOf("Carpetas", "Recientes")
 
     Scaffold(
+        // Mostrar top bar solo si no hay nota abierta
         topBar = {
-            TopNavigationTabs(
-                tabTitles = tabTitles,
-                selectedTabIndex = selectedTabIndex,
-                onTabSelected = { selectedTabIndex = it },
-                openDrawer = { scope.launch { drawerState.open() } }
-            )
+            if (selectedNote == null) {
+                TopNavigationTabs(
+                    tabTitles = tabTitles,
+                    selectedTabIndex = selectedTabIndex,
+                    onTabSelected = { selectedTabIndex = it },
+                    openDrawer = { scope.launch { drawerState.open() } }
+                )
+            }
         },
         floatingActionButton = {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier.padding(bottom = 56.dp, end = 16.dp)
-            ) {
-                AddFolderFab(
-                    viewModel = viewModel,
-                    currentFolderId = selectedFolderId
-                )
-                AddNoteFab(
-                    viewModel = viewModel,
-                    currentFolderId = selectedFolderId,
-                    onNoteCreated = { note ->
-                        selectedNote = note
-                    }
-                )
+            if (selectedNote == null) {
+                // Mostrar únicamente botones FAB con lista visible
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.padding(bottom = 56.dp, end = 16.dp)
+                ) {
+                    AddFolderFab(
+                        viewModel = viewModel,
+                        currentFolderId = selectedFolderId
+                    )
+                    AddNoteFab(
+                        viewModel = viewModel,
+                        currentFolderId = selectedFolderId,
+                        onNoteCreated = { note ->
+                            selectedNote = note
+                        }
+                    )
+                }
             }
         },
         bottomBar = { /* Tu barra inferior si la tienes */ }
@@ -66,10 +73,10 @@ fun MainView(
                         },
                         onCancel = {
                             selectedNote = null
-                        }
+                        },
+                        modifier = Modifier.fillMaxSize()  // Ocupa toda la pantalla sin barras
                     )
                 }
-
                 selectedTabIndex == 0 -> {
                     ItemsView(
                         viewModel = viewModel,
@@ -83,8 +90,6 @@ fun MainView(
         }
     }
 }
-
-
 
 @Composable
 fun RecientesView() {
