@@ -74,7 +74,7 @@ fun MainView(
                         onCancel = {
                             selectedNote = null
                         },
-                        modifier = Modifier.fillMaxSize()  // Ocupa toda la pantalla sin barras
+                        modifier = Modifier.fillMaxSize()
                     )
                 }
                 selectedTabIndex == 0 -> {
