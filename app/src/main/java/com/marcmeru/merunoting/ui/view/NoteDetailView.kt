@@ -3,11 +3,13 @@ package com.marcmeru.merunoting.ui.view
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.marcmeru.merunoting.data.entity.Item
 import com.marcmeru.merunoting.viewModel.ItemViewModel
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun NoteDetailView(
@@ -26,17 +28,30 @@ fun NoteDetailView(
             .fillMaxSize()
             .padding(24.dp)
     ) {
-        Text(
-            text = "Editar Nota",
-            style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-
         OutlinedTextField(
             value = title,
             onValueChange = { title = it },
-            label = { Text("Título") },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            maxLines = 1,
+            singleLine = true,
+            textStyle = MaterialTheme.typography.headlineMedium,
+            label = null
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+
+        val daysDiff = viewModel.getDaysDifference(note)
+
+        val creationText = when (daysDiff) {
+            0 -> "Creado hoy"
+            1 -> "Creado ayer"
+            in 2..Int.MAX_VALUE -> "Creado: ${formatDate(note.createdAt)}"
+            else -> "Fecha desconocida"
+        }
+
+        Text(
+            text = creationText,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -44,7 +59,6 @@ fun NoteDetailView(
         OutlinedTextField(
             value = content,
             onValueChange = { content = it },
-            label = { Text("Contenido") },
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f),
@@ -88,5 +102,14 @@ fun NoteDetailView(
                 Text(if (isSaving) "Guardando..." else "Guardar")
             }
         }
+    }
+}
+
+fun formatDate(timestamp: Long): String {
+    return if (timestamp <= 0L) {
+        "Fecha desconocida"
+    } else {
+        val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        sdf.format(Date(timestamp))
     }
 }
