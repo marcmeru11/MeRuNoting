@@ -54,12 +54,13 @@ interface ItemDao {
     @Query("SELECT * FROM items WHERE id = :id")
     suspend fun getById(id: Long): Item
 
-    /**
-     * Retrieves all root items (items without a parent).
-     *
-     * @return Flow emitting lists of root items ordered by name.
-     */
-    @Query("SELECT * FROM items WHERE parent_id IS NULL ORDER BY name")
+    @Query("""
+    SELECT * FROM items
+    WHERE parent_id IS NULL
+    ORDER BY 
+        CASE WHEN type = 'folder' THEN 0 ELSE 1 END,
+        updated_at DESC
+    """)
     fun getRootItems(): Flow<List<Item>>
 
     /**
@@ -68,7 +69,13 @@ interface ItemDao {
      * @param parentId The ID of the parent item.
      * @return Flow emitting lists of child items ordered by name.
      */
-    @Query("SELECT * FROM items WHERE parent_id = :parentId ORDER BY name")
+    @Query("""
+    SELECT * FROM items
+    WHERE parent_id = :parentId
+    ORDER BY 
+        CASE WHEN type = 'folder' THEN 0 ELSE 1 END,
+        updated_at DESC
+    """)
     fun getChildren(parentId: Long): Flow<List<Item>>
 
     /**
