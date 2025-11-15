@@ -7,6 +7,10 @@ import com.marcmeru.merunoting.data.repository.ItemRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 /**
  * ViewModel que gestiona la lógica y datos relacionados con los [Item].
@@ -106,4 +110,23 @@ class ItemViewModel(private val repository: ItemRepository) : ViewModel() {
     suspend fun getItemById(id: Long): Item {
         return repository.getById(id)
     }
+
+    fun getCreationDay(item: Item): String {
+        val timestamp = item.createdAt
+        if (timestamp <= 0L) return "Desconocido"
+        val date = Date(timestamp)
+        val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        return formatter.format(date)
+    }
+
+    fun getDaysDifference(item: Item): Int {
+        val createdAtMillis = item.createdAt
+        if (createdAtMillis <= 0L) return -1
+
+        val now = System.currentTimeMillis()
+        val diffMillis = now - createdAtMillis
+
+        return TimeUnit.MILLISECONDS.toDays(diffMillis).toInt()
+    }
+
 }
