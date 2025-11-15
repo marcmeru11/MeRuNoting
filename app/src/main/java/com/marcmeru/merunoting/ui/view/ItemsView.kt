@@ -6,9 +6,11 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.marcmeru.merunoting.data.entity.Item
@@ -58,35 +60,48 @@ fun ItemsView(
             folders = path,
             onFolderSelected = onFolderSelected
         )
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            contentPadding = PaddingValues(8.dp),
-            modifier = Modifier.weight(1f)
-        ) {
-            items(items) { item ->
-                if (item.type == "folder") {
-                    FolderCard(
-                        item = item,
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .height(160.dp)
-                            .clickable { onFolderSelected(item.id) },
-                        onDeleteClicked = { folderToDelete ->
-                            viewModel.deleteItem(folderToDelete)
-                        }
-                    )
 
-                } else if (item.type == "note") {
-                    NoteCard(
-                        item = item,
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .height(160.dp)
-                            .clickable { onNoteSelected(item) },
-                        onDeleteClicked = {
-                            noteToDelete = it
-                        }
-                    )
+        if (items.isEmpty()) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "No hay elementos.",
+                    modifier = Modifier.padding(16.dp),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        } else {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                contentPadding = PaddingValues(8.dp),
+                modifier = Modifier.weight(1f)
+            ) {
+                items(items) { item ->
+                    if (item.type == "folder") {
+                        FolderCard(
+                            item = item,
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .height(160.dp)
+                                .clickable { onFolderSelected(item.id) },
+                            onDeleteClicked = { folderToDelete ->
+                                viewModel.deleteItem(folderToDelete)
+                            }
+                        )
+                    } else if (item.type == "note") {
+                        NoteCard(
+                            item = item,
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .height(160.dp)
+                                .clickable { onNoteSelected(item) },
+                            onDeleteClicked = {
+                                noteToDelete = it
+                            }
+                        )
+                    }
                 }
             }
         }
