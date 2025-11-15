@@ -1,7 +1,6 @@
 package com.marcmeru.merunoting.ui.view
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -12,7 +11,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.marcmeru.merunoting.data.entity.Item
@@ -28,24 +26,16 @@ fun FolderCard(
 
     Surface(
         modifier = modifier
-            .clickable { /* Mantiene la selección al pulsar el card */ }
-            .shadow(elevation = 8.dp, shape = RoundedCornerShape(16.dp))
-            .size(160.dp),
-        shape = RoundedCornerShape(16.dp),
+            .fillMaxWidth()
+            .heightIn(min = 120.dp) // más alto para espacio vertical
+            .shadow(elevation = 8.dp, shape = RoundedCornerShape(10.dp)),
+        shape = RoundedCornerShape(10.dp),
         color = MaterialTheme.colorScheme.secondaryContainer
     ) {
         Column(
             modifier = Modifier
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            MaterialTheme.colorScheme.secondaryContainer,
-                            MaterialTheme.colorScheme.secondaryContainer
-                        )
-                    ),
-                    shape = RoundedCornerShape(16.dp)
-                )
-                .padding(10.dp)
+                .background(MaterialTheme.colorScheme.secondaryContainer)
+                .padding(horizontal = 10.dp, vertical = 8.dp)
         ) {
             Box(
                 modifier = Modifier.fillMaxWidth()
@@ -55,18 +45,20 @@ fun FolderCard(
                     contentDescription = "Carpeta",
                     tint = MaterialTheme.colorScheme.onSecondaryContainer,
                     modifier = Modifier
-                        .size(48.dp)
+                        .size(80.dp)
                         .align(Alignment.CenterStart)
                 )
+
                 IconButton(
                     onClick = { expanded = true },
                     modifier = Modifier.align(Alignment.TopEnd)
                 ) {
                     Icon(
                         imageVector = Icons.Filled.MoreVert,
-                        contentDescription = "Más opciones"
+                        contentDescription = "Opciones carpeta"
                     )
                 }
+
                 DropdownMenu(
                     expanded = expanded,
                     onDismissRequest = { expanded = false }
@@ -81,7 +73,7 @@ fun FolderCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(0.dp))
 
             Text(
                 text = item.name,
@@ -89,8 +81,11 @@ fun FolderCard(
                 color = MaterialTheme.colorScheme.onSecondaryContainer,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 10.dp, top = 0.dp, end = 10.dp, bottom = 0.dp)
             )
+
         }
     }
 
@@ -110,7 +105,9 @@ fun FolderCard(
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showConfirmDelete = false }) {
+                TextButton(
+                    onClick = { showConfirmDelete = false }
+                ) {
                     Text("Cancelar")
                 }
             }
