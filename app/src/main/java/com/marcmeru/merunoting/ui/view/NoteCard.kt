@@ -27,27 +27,27 @@ fun NoteCard(
             modifier = modifier
                 .fillMaxWidth()
                 .heightIn(min = 100.dp)
-                .shadow(elevation = 8.dp, shape = RoundedCornerShape(16.dp)),
-            shape = RoundedCornerShape(16.dp),
+                .shadow(elevation = 8.dp, shape = RoundedCornerShape(10.dp)),
+            shape = RoundedCornerShape(10.dp),
             color = MaterialTheme.colorScheme.surfaceVariant
         ) {
             Column(
                 modifier = Modifier
                     .background(MaterialTheme.colorScheme.surfaceVariant)
-                    .padding(10.dp)
+                    .padding(top = 0.dp, start = 10.dp,  bottom = 5.dp)
             ) {
                 Box(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = item.name,
+                        text = item.name, //?: "",
                         style = MaterialTheme.typography.headlineSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier
                             .align(Alignment.CenterStart)
-                            .padding(end = 33.dp)
+                            .padding(end = 40.dp)
                     )
                     IconButton(
                         onClick = { expanded = true },
@@ -73,13 +73,13 @@ fun NoteCard(
                 }
 
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(0.dp))
 
                 Text(
                     text = item.content ?: "",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 3,
+                    maxLines = 5,
                     overflow = TextOverflow.Ellipsis
                 )
             }
