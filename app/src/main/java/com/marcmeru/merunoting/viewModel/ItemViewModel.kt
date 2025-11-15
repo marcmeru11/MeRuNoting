@@ -111,14 +111,7 @@ class ItemViewModel(private val repository: ItemRepository) : ViewModel() {
         return repository.getById(id)
     }
 
-    fun getCreationDay(item: Item): String {
-        val timestamp = item.createdAt
-        if (timestamp <= 0L) return "Desconocido"
-        val date = Date(timestamp)
-        val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-        return formatter.format(date)
-    }
-
+    //TODO()
     fun getDaysDifference(item: Item): Int {
         val createdAtMillis = item.createdAt
         if (createdAtMillis <= 0L) return -1
@@ -128,5 +121,21 @@ class ItemViewModel(private val repository: ItemRepository) : ViewModel() {
 
         return TimeUnit.MILLISECONDS.toDays(diffMillis).toInt()
     }
+
+    /**
+     * Returns hours since last modification.
+     * TODO()
+     */
+    fun getHoursSinceLastModified(item: Item): Long {
+        val updatedAtMillis = item.updatedAt
+        if (updatedAtMillis <= 0L) return -1
+
+        val now = System.currentTimeMillis()
+        val diffMillis = now - updatedAtMillis
+
+        return TimeUnit.MILLISECONDS.toHours(diffMillis)
+    }
+
+
 
 }

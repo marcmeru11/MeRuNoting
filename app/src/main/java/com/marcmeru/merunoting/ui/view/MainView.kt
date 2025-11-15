@@ -28,7 +28,6 @@ fun MainView(
     val tabTitles = listOf("Carpetas", "Recientes")
 
     Scaffold(
-        // Mostrar top bar solo si no hay nota abierta
         topBar = {
             if (selectedNote == null) {
                 TopNavigationTabs(
@@ -40,8 +39,7 @@ fun MainView(
             }
         },
         floatingActionButton = {
-            if (selectedNote == null) {
-                // Mostrar únicamente botones FAB con lista visible
+            if (selectedNote == null && selectedTabIndex == 0) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     modifier = Modifier.padding(bottom = 56.dp, end = 16.dp)
@@ -85,13 +83,11 @@ fun MainView(
                         onNoteSelected = { note -> selectedNote = note }
                     )
                 }
-                selectedTabIndex == 1 -> RecientesView()
+                selectedTabIndex == 1 -> RecentsView(
+                    viewModel = viewModel,
+                    onNoteSelected = { note -> selectedNote = note }
+                )
             }
         }
     }
-}
-
-@Composable
-fun RecientesView() {
-    Text("Contenido de Recientes aún no implementado")
 }
