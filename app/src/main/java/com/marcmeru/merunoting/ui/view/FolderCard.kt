@@ -14,6 +14,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.marcmeru.merunoting.data.entity.Item
+import java.util.Locale
 
 @Composable
 fun FolderCard(
@@ -76,7 +77,7 @@ fun FolderCard(
             Spacer(modifier = Modifier.height(0.dp))
 
             Text(
-                text = item.name,
+                text = item.name.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() },
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.onSecondaryContainer,
                 maxLines = 2,
