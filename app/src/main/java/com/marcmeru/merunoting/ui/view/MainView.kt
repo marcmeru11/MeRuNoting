@@ -11,11 +11,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.marcmeru.merunoting.data.entity.Item
 import com.marcmeru.merunoting.viewModel.ItemViewModel
+import com.marcmeru.merunoting.viewModel.ThemeViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun MainView(
     viewModel: ItemViewModel,
+    themeViewModel: ThemeViewModel,
     initialFolderId: Long? = null
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -86,7 +88,7 @@ fun MainView(
                     viewModel = viewModel,
                     onNoteSelected = { note -> selectedNote = note }
                 )
-                selectedTabIndex == 2 -> SettingsView()
+                selectedTabIndex == 2 -> SettingsView(viewModel = themeViewModel)
             }
         }
     }
