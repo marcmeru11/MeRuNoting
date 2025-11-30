@@ -13,6 +13,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.marcmeru.merunoting.data.entity.Item
+import java.util.Locale
 
 @Composable
 fun RecentNoteCard(
@@ -52,7 +53,7 @@ fun RecentNoteCard(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = item.name,
+                    text = item.name.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() },
                     style = MaterialTheme.typography.titleMedium,
                     maxLines = 1,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,

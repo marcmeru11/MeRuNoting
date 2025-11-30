@@ -1,15 +1,29 @@
 package com.marcmeru.merunoting.ui.view
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.focus.onFocusEvent
+import android.widget.TextView
+import android.text.method.LinkMovementMethod
 import com.marcmeru.merunoting.data.entity.Item
 import com.marcmeru.merunoting.viewModel.ItemViewModel
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import io.noties.markwon.Markwon
+import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
+import io.noties.markwon.ext.tables.TablePlugin
+import io.noties.markwon.ext.tasklist.TaskListPlugin
+import com.marcmeru.merunoting.ui.view.utils.formatDate
+import kotlinx.coroutines.delay
 
 @Composable
 fun NoteDetailView(
@@ -19,97 +33,111 @@ fun NoteDetailView(
     onCancel: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var title by remember { mutableStateOf(note.name) }
-    var content by remember { mutableStateOf(note.content ?: "") }
-    var isSaving by remember { mutableStateOf(false) }
+    var isEditMode by remember { mutableStateOf(false) }
+    var editingTitle by remember { mutableStateOf(note.name) }
+    var editingContent by remember { mutableStateOf(note.content ?: "") }
+    var contentFocused by remember { mutableStateOf(false) }
+    val scrollState = rememberScrollState()
+
+    LaunchedEffect(note) {
+        if (!isEditMode) {
+            editingTitle = note.name
+            editingContent = note.content ?: ""
+        }
+    }
+
+    LaunchedEffect(editingTitle, editingContent) {
+        if (isEditMode) {
+            delay(500)
+            if (editingTitle.isNotBlank()) {
+                val updatedNote = note.copy(
+                    name = editingTitle.trim(),
+                    content = editingContent.trim(),
+                    updatedAt = System.currentTimeMillis()
+                )
+                viewModel.updateItem(updatedNote) {}
+            }
+        }
+    }
+
+    LaunchedEffect(contentFocused) {
+        if (contentFocused) {
+            delay(300)
+            scrollState.animateScrollTo(scrollState.maxValue)
+        }
+    }
 
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(24.dp)
+            .imePadding()
+            .padding(16.dp)
+            .verticalScroll(scrollState)
     ) {
-        OutlinedTextField(
-            value = title,
-            onValueChange = { title = it },
-            modifier = Modifier.fillMaxWidth(),
-            maxLines = 1,
-            singleLine = true,
-            textStyle = MaterialTheme.typography.headlineMedium,
-            label = null
+        NoteHeader(
+            title = editingTitle,
+            isEditMode = isEditMode,
+            onTitleChange = { editingTitle = it },
+            onToggleEditMode = { isEditMode = !isEditMode }
         )
-        Spacer(modifier = Modifier.height(8.dp))
 
         val daysDiff = viewModel.getDaysDifference(note)
-
         val creationText = when (daysDiff) {
             0 -> "Creado hoy"
             1 -> "Creado ayer"
             in 2..Int.MAX_VALUE -> "Creado: ${formatDate(note.createdAt)}"
             else -> "Fecha desconocida"
         }
-
         Text(
             text = creationText,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.outline,
+            modifier = Modifier.padding(bottom = 12.dp)
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = content,
-            onValueChange = { content = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
-            singleLine = false,
-            maxLines = Int.MAX_VALUE
+        Divider(
+            modifier = Modifier.padding(bottom = 16.dp),
+            color = MaterialTheme.colorScheme.outlineVariant
         )
 
-        Spacer(modifier = Modifier.height(32.dp))
+        if (isEditMode) {
+            TextField(
+                value = editingContent,
+                onValueChange = { editingContent = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .onFocusEvent { contentFocused = it.isFocused },
+                placeholder = { Text("Escribe en markdown...") },
+                singleLine = false,
+                maxLines = Int.MAX_VALUE,
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+                    unfocusedIndicatorColor = MaterialTheme.colorScheme.outline
+                )
+            )
+        } else {
+            MarkdownRenderer(
+                content = editingContent,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            )
+        }
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
-        ) {
-            TextButton(
-                onClick = {
-                    if (!isSaving) {
-                        onCancel()
-                    }
+        Spacer(modifier = Modifier.height(24.dp))
+
+        if (!isEditMode) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                Button(onClick = onCancel) {
+                    Text("Volver")
                 }
-            ) {
-                Text("Cancelar")
-            }
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            Button(
-                onClick = {
-                    isSaving = true
-                    val updatedNote = note.copy(
-                        name = title.trim(),
-                        content = content.trim(),
-                        updatedAt = System.currentTimeMillis()
-                    )
-                    viewModel.updateItem(updatedNote) {
-                        isSaving = false
-                        onNoteUpdated()
-                    }
-                },
-                enabled = !isSaving && title.isNotBlank(),
-            ) {
-                Text(if (isSaving) "Guardando..." else "Guardar")
             }
         }
-    }
-}
-
-fun formatDate(timestamp: Long): String {
-    return if (timestamp <= 0L) {
-        "Fecha desconocida"
-    } else {
-        val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-        sdf.format(Date(timestamp))
     }
 }

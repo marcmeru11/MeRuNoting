@@ -97,9 +97,7 @@ fun ItemsView(
                                 .padding(8.dp)
                                 .height(160.dp)
                                 .clickable { onNoteSelected(item) },
-                            onDeleteClicked = {
-                                noteToDelete = it
-                            }
+                            onDeleteClicked = { noteToDelete = it }
                         )
                     }
                 }
