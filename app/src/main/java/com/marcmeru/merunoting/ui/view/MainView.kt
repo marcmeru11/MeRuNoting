@@ -25,7 +25,7 @@ fun MainView(
     var selectedFolderId by remember { mutableStateOf(initialFolderId) }
     var selectedNote by remember { mutableStateOf<Item?>(null) }
 
-    val tabTitles = listOf("Carpetas", "Recientes")
+    val tabTitles = listOf("Carpetas", "Recientes", "Ajustes")
 
     Scaffold(
         topBar = {
@@ -57,8 +57,7 @@ fun MainView(
                     )
                 }
             }
-        },
-        bottomBar = { /* Tu barra inferior si la tienes */ }
+        }
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
             when {
@@ -87,6 +86,7 @@ fun MainView(
                     viewModel = viewModel,
                     onNoteSelected = { note -> selectedNote = note }
                 )
+                selectedTabIndex == 2 -> SettingsView()
             }
         }
     }
